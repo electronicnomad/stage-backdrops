@@ -1,3 +1,7 @@
+[English](#english) | [한국어](#korean)
+
+<a id="english"></a>
+
 # AI-Powered Concert Stage Backdrop Generator Architecture
 
 This document specifies the end-to-end architecture and modular structure of the automated concert stage backdrop video generation system powered by Google Gemini and Google Veo models.
@@ -224,6 +228,10 @@ Component matrix detailing the primary responsibilities and relationships of all
 <div style="page-break-before: always;"></div>
 
 ---
+
+[English](#english) | [한국어](#korean)
+
+<a id="korean"></a>
 
 # AI 기반 콘서트 무대 백월 영상 생성기 아키텍처 (AI-Powered Concert Stage Backdrop Generator Architecture)
 

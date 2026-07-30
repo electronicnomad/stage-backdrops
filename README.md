@@ -1,3 +1,7 @@
+[English](#english) | [한국어](#korean)
+
+<a id="english"></a>
+
 # AI-Powered Concert Stage Backdrop Generator
 
 A full-stack automation pipeline designed to generate stunning, premium 16:9 (1080p) stage backdrop videos for live concerts using Google Gemini and Veo models.
@@ -131,6 +135,10 @@ If you have already generated and stored prompts in `./input/prompts/` and want 
 <div style="page-break-before: always;"></div>
 
 ---
+
+[English](#english) | [한국어](#korean)
+
+<a id="korean"></a>
 
 # AI 기반 콘서트 무대 백월 영상 생성기 (AI-Powered Concert Stage Backdrop Generator)
 
