@@ -19,9 +19,8 @@ if not gemini_key or gemini_key == "YOUR_GEMINI_API_KEY":
     gemini_key = os.getenv("GEMINI_API_KEY")
 
 if not gemini_key:
-    print("[오류 / Error] API 키가 설정되지 않았습니다. / API key is not configured.")
-    print("프로젝트 루트 디렉토리의 .env 파일에 'GEMINI_KEY=your_key' 형식으로 키를 입력하시거나,")
-    print("시스템 환경 변수 'GEMINI_API_KEY'를 설정해 주세요.")
+    print("[Error] API key is not configured.")
+    print("Please configure 'GEMINI_KEY=your_key' in your .env file or set the system environment variable 'GEMINI_API_KEY'.")
     sys.exit(1)
 
 client = genai.Client(api_key=gemini_key)
@@ -29,7 +28,7 @@ client = genai.Client(api_key=gemini_key)
 # 3. 설정 파일 로드 / Load pipeline configuration file
 CONFIG_PATH = "./config_prompts.json"
 if not os.path.exists(CONFIG_PATH):
-    print(f"[오류 / Error] 설정 파일 '{CONFIG_PATH}'이 존재하지 않습니다. / Configuration file does not exist.")
+    print(f"[Error] Configuration file '{CONFIG_PATH}' does not exist.")
     sys.exit(1)
 
 with open(CONFIG_PATH, "r", encoding="utf-8") as f:
@@ -52,12 +51,12 @@ os.makedirs(PROMPTS_DIR, exist_ok=True)
 os.makedirs("./scratch", exist_ok=True)
 
 def format_duration(seconds):
-    """초를 분과 초 형태의 읽기 쉬운 문자열로 변환합니다. / Converts seconds into a human-readable duration string."""
+    """Converts seconds into a human-readable duration string."""
     mins = int(seconds // 60)
     secs = int(seconds % 60)
     if mins > 0:
-        return f"{mins}분 {secs}초 ({mins}m {secs}s)"
-    return f"{secs}초 ({secs}s)"
+        return f"{mins}m {secs}s"
+    return f"{secs}s"
 
 def find_image_file(song_name, img_dir="./input/images"):
     """곡명에 일치하는 스타일 레퍼런스 이미지 검색 / Locate style reference image for a given song"""
@@ -95,7 +94,7 @@ def save_prompt(song_name, prompt_text, prompts_dir="./input/prompts"):
         if not os.path.exists(filepath):
             with open(filepath, "w", encoding="utf-8") as pf:
                 pf.write(prompt_text)
-            print(f"      [프롬프트 저장 완료 / Prompt Saved] {filepath}")
+            print(f"      [Prompt Saved] {filepath}")
             return filepath
         index += 1
 
@@ -144,33 +143,29 @@ def scan_batch_jobs():
 def extract_audio(media_path, song_name):
     """비디오/미디어 파일에서 오디오 트랙 추출 / Extract audio track from media file using FFmpeg"""
     ext = os.path.splitext(media_path)[1].lower()
-    # 이미 오디오 파일인 경우 별도 추출 없이 원본 파일 경로 리턴 / Return original path if already audio
     if ext in ['.mp3', '.wav', '.m4a', '.ogg', '.flac']:
-        print(f"   -> [{song_name}] 오디오 파일 감지됨 / Audio file detected ({media_path}).")
+        print(f"   -> [{song_name}] Audio file detected ({media_path}). Using directly.")
         return media_path
         
     temp_audio_path = os.path.join("./scratch", f"{song_name}_temp.mp3")
-    print(f"   -> [{song_name}] 오디오 추출 중 / Extracting audio ({media_path} -> {temp_audio_path})...")
+    print(f"   -> [{song_name}] Extracting audio stream ({media_path} -> {temp_audio_path})...")
     
-    # FFmpeg를 이용하여 오디오 트랙 추출 / Extract audio stream via FFmpeg
     cmd = ["ffmpeg", "-y", "-i", media_path, "-vn", "-acodec", "libmp3lame", "-q:a", "4", temp_audio_path]
     result = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     
     if result.returncode == 0 and os.path.exists(temp_audio_path):
         return temp_audio_path
     else:
-        print(f"      [경고 / Warning] 오디오 추출 실패. / Audio extraction failed.")
+        print(f"      [Warning] Audio extraction failed.")
         return None
 
 def extract_lyrics(client, audio_file_path, song_name, model_name):
     """Gemini API를 이용한 가사 전사 / Transcribe song lyrics using Gemini API"""
-    print(f"   -> [{song_name}] 가사 추출 진행 중 / Transcribing lyrics (Gemini API)...")
+    print(f"   -> [{song_name}] Transcribing lyrics (Gemini API)...")
     
-    # 1. Gemini File API에 업로드 / Upload audio to Gemini File API
     uploaded_audio = client.files.upload(file=audio_file_path)
     
     try:
-        # 2. 오디오 분석을 통한 가사 추출 / Transcribe lyrics from audio stream
         prompt = "Please transcribe the lyrics of the song in this audio file. If the song is in Korean, transcribe it in Korean. Output only the lyrics text, formatting it line by line, without any introduction, explanations, or metadata."
         
         response = client.models.generate_content(
@@ -185,7 +180,7 @@ def extract_lyrics(client, audio_file_path, song_name, model_name):
 
 def analyze_media_style(client, uploaded_file, song_name, model_name):
     """Gemini API를 이용한 사운드 및 음악 스타일 분석 / Analyze sound style and mood using Gemini API"""
-    print(f"   -> [{song_name}] 음악 스타일 분석 중 / Analyzing sound style (Gemini API)...")
+    print(f"   -> [{song_name}] Analyzing sound style (Gemini API)...")
     prompt = (
         "Analyze the audio of this song and describe the following characteristics in English:\n"
         "1. Overall Mood and Emotion (e.g., dreamy, nostalgic, energetic)\n"
@@ -203,14 +198,13 @@ def analyze_media_style(client, uploaded_file, song_name, model_name):
 
 def generate_rich_prompt(client, image_path, lyrics, music_style, song_name, base_concept, config, model_name):
     """멀티모달 요소들을 결합하여 Veo 최적화 연출 프롬프트 합성 / Synthesize enriched visual prompt for Veo"""
-    print(f"   -> [{song_name}] 멀티모달 프롬프트 합성 중 / Building enriched visual prompt...")
+    print(f"   -> [{song_name}] Synthesizing enriched visual prompt...")
     
     uploaded_image = None
     contents = []
     
-    # 이미지 파일이 존재하면 업로드하여 포함 / Upload style reference image if present
     if image_path and os.path.exists(image_path):
-        print(f"      스타일 이미지 업로드 중 / Uploading style reference: {image_path}")
+        print(f"      Uploading style reference image: {image_path}")
         uploaded_image = client.files.upload(file=image_path)
         contents.append(uploaded_image)
         
@@ -242,17 +236,15 @@ def generate_video_job(job):
     song = job["song_name"]
     base_concept = job["base_concept"]
     
-    # 대상 디렉토리에 존재하는 기존 비디오 파일 개수 확인 / Count existing output files
     existing_files = glob.glob(os.path.join(OUTPUT_DIR, f"{song}_backdrop_*.mp4"))
     existing_count = len(existing_files)
     
     if existing_count >= NUM_OUTPUTS:
-        print(f"[건너뛰기 / Skip] '{song}' 관련 영상이 이미 총 {existing_count}개 존재합니다 (목표: {NUM_OUTPUTS}개).")
+        print(f"[Skip] '{song}' videos already exist ({existing_count}/{NUM_OUTPUTS}). Target reached.")
         return True
         
     num_needed = NUM_OUTPUTS - existing_count
     
-    # 중복되지 않는 비어 있는 파일 인덱스 결정 / Find vacant file indices
     needed_indices = []
     index = 1
     while len(needed_indices) < num_needed:
@@ -262,9 +254,8 @@ def generate_video_job(job):
             needed_indices.append(index)
         index += 1
         
-    print(f"\n[시작 / Start] '{song}' 영상 생성 프로세스 가동 (현재 {existing_count}개 존재 -> {num_needed}개 추가 생성 예정)")
+    print(f"\n[Start] Starting video generation for '{song}' ({existing_count} existing -> generating {num_needed} more)")
     
-    # 미디어 자산 탐색 / Locate reference assets
     image_path = find_image_file(song)
     media_path = find_media_file(song)
     
@@ -278,30 +269,27 @@ def generate_video_job(job):
         lyrics_file_path = os.path.join(LYRICS_DIR, f"{song}_lyrics.txt")
         style_file_path = os.path.join(LYRICS_DIR, f"{song}_music_style.txt")
         
-        # 가사 캐시 재사용 확인 / Load cached lyrics
         if os.path.exists(lyrics_file_path):
-            print(f"      [가사 캐시 재사용 / Cache Hit] {lyrics_file_path}")
+            print(f"      [Cache Hit] Reusing lyrics file: {lyrics_file_path}")
             with open(lyrics_file_path, "r", encoding="utf-8") as lf:
                 lyrics = lf.read()
                 
-        # 스타일 캐시 재사용 확인 / Load cached sound style
         if os.path.exists(style_file_path):
-            print(f"      [스타일 캐시 재사용 / Cache Hit] {style_file_path}")
+            print(f"      [Cache Hit] Reusing sound style file: {style_file_path}")
             with open(style_file_path, "r", encoding="utf-8") as sf:
                 music_style = sf.read()
                 
-        # 캐시가 없는 경우 오디오 분석 수행 / Perform audio analysis if cache misses
         if not lyrics or not music_style:
             temp_audio_path = extract_audio(media_path, song)
             if temp_audio_path:
                 try:
-                    print(f"      [업로드 / Upload] 분석용 오디오 파일 업로드 중 (Gemini API)...")
+                    print(f"      [Upload] Uploading audio for analysis (Gemini API)...")
                     uploaded_audio = client.files.upload(file=temp_audio_path)
                     uploaded_files_to_clean.append(uploaded_audio)
                     
                     if not lyrics:
                         lyrics_prompt = "Please transcribe the lyrics of the song in this audio file. If the song is in Korean, transcribe it in Korean. Output only the lyrics text, formatting it line by line, without any introduction, explanations, or metadata."
-                        print(f"   -> [{song}] 가사 추출 진행 중...")
+                        print(f"   -> [{song}] Transcribing lyrics...")
                         response = client.models.generate_content(
                             model=GENERATOR_MODEL,
                             contents=[uploaded_audio, lyrics_prompt]
@@ -309,15 +297,15 @@ def generate_video_job(job):
                         lyrics = response.text.strip()
                         with open(lyrics_file_path, "w", encoding="utf-8") as lf:
                             lf.write(lyrics)
-                        print(f"      [가사 저장 완료 / Saved] {lyrics_file_path}")
+                        print(f"      [Lyrics Saved] {lyrics_file_path}")
                         
                     if not music_style:
                         music_style = analyze_media_style(client, uploaded_audio, song, GENERATOR_MODEL)
                         with open(style_file_path, "w", encoding="utf-8") as sf:
                             sf.write(music_style)
-                        print(f"      [스타일 저장 완료 / Saved] {style_file_path}")
+                        print(f"      [Style Saved] {style_file_path}")
                 except Exception as e:
-                    print(f"      [경고 / Warning] 미디어 분석 중 오류 발생: {e}")
+                    print(f"      [Warning] Error during media analysis: {e}")
             
     # 2단계: 프롬프트 강화 작업 / Phase 2: Prompt Enrichment
     rich_prompt = base_concept
@@ -329,26 +317,23 @@ def generate_video_job(job):
             uploaded_files_to_clean.append(uploaded_image)
         rich_prompt = rich_prompt_result
     except Exception as e:
-        print(f"      [경고 / Warning] 강화 프롬프트 생성 실패 (기본 콘셉트 사용): {e}")
+        print(f"      [Warning] Failed to generate enriched prompt (using default concept): {e}")
         
-    print(f"\n      >>> 합성된 강화 프롬프트 / Enriched Prompt:")
+    print(f"\n      >>> Synthesized Enriched Prompt:")
     print(f"      {rich_prompt}\n")
     
-    # 생성된 프롬프트 아카이빙 저장 / Archive enriched prompt
     save_prompt(song, rich_prompt, PROMPTS_DIR)
     
-    # Gemini 임시 파일 정리 / Clean up uploaded Gemini files
     for f in uploaded_files_to_clean:
         try:
             client.files.delete(name=f.name)
-            print(f"      [정리 / Cleaned] Gemini 임시 파일 삭제 완료: {f.name}")
+            print(f"      [Cleaned] Removed temporary Gemini file: {f.name}")
         except Exception as e:
-            print(f"      [경고 / Warning] Gemini 임시 파일 삭제 실패: {e}")
+            print(f"      [Warning] Failed to delete temporary Gemini file: {e}")
             
-    # 로컬 임시 오디오 파일 정리 / Clean up local temp audio file
     if temp_audio_path and os.path.exists(temp_audio_path) and temp_audio_path != media_path:
         os.remove(temp_audio_path)
-        print(f"      [정리 / Cleaned] 로컬 임시 오디오 파일 삭제 완료: {temp_audio_path}")
+        print(f"      [Cleaned] Removed local temp audio file: {temp_audio_path}")
         
     # 3단계: Veo 모델 비디오 생성 / Phase 3: Veo Video Generation
     success_all = True
@@ -357,11 +342,11 @@ def generate_video_job(job):
         filename = f"{song}_backdrop_{index}.mp4"
         filepath = os.path.join(OUTPUT_DIR, filename)
         
-        print(f"\n   -> [{song}] {index}/{NUM_OUTPUTS} 번째 영상 생성 중 / Generating video...")
+        print(f"\n   -> [{song}] Generating video {index}/{NUM_OUTPUTS}...")
         
         single_start_time = time.time()
         start_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"      시작 시각 / Start Time: {start_timestamp}")
+        print(f"      Start Time: {start_timestamp}")
         
         try:
             operation = client.models.generate_videos(
@@ -377,7 +362,7 @@ def generate_video_job(job):
             while not operation.done:
                 elapsed = time.time() - start_time
                 if elapsed > POLLING_TIMEOUT_SEC:
-                    print(f"      [오류 / Timeout] 대기 시간 초과 ({POLLING_TIMEOUT_SEC}초 경과)")
+                    print(f"      [Timeout] Polling wait time exceeded ({POLLING_TIMEOUT_SEC}s)")
                     success_all = False
                     break
                     
@@ -394,18 +379,18 @@ def generate_video_job(job):
                 
             single_elapsed = time.time() - single_start_time
             end_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            print(f"      끝난 시각 / End Time: {end_timestamp}")
-            print(f"      소요 시간 / Duration: {format_duration(single_elapsed)}")
-            print(f"      [성공 / Success] 비디오 파일 저장 완료: {filepath}")
+            print(f"      End Time: {end_timestamp}")
+            print(f"      Duration: {format_duration(single_elapsed)}")
+            print(f"      [Success] Video file saved: {filepath}")
             
         except errors.APIError as e:
-            print(f"      [API 오류 / API Error] 생성 실패: {e}")
+            print(f"      [API Error] Video generation failed: {e}")
             if e.code in [401, 403] or "unauthorized" in str(e).lower() or "API_KEY_INVALID" in str(e):
-                print("인증 오류가 발견되어 작업을 중단합니다. / Authentication error, stopping batch.")
+                print("Authentication error detected. Halting batch execution. Please check your API key.")
                 sys.exit(1)
             success_all = False
         except Exception as e:
-            print(f"      [예외 발생 / Exception] 처리 중 예상치 못한 에러: {e}")
+            print(f"      [Exception] Unexpected error during processing: {e}")
             success_all = False
             
         if i < len(needed_indices) - 1:
@@ -417,18 +402,18 @@ def main():
     batch_jobs = scan_batch_jobs()
     
     if not batch_jobs:
-        print("[경고 / Warning] 스캔된 작업이 없습니다. ./input/images 또는 ./input/songs 디렉토리를 확인하세요.")
+        print("[Warning] No batch jobs found. Check if files exist in './input/images' or './input/songs'.")
         return
         
     print(f"==================================================")
-    print(f" 백월 영상 배치 생성을 시작합니다 / Starting backdrop video batch pipeline.")
-    print(f" 총 작업 수 / Total jobs: {len(batch_jobs)}개 (곡당 {NUM_OUTPUTS}개 생성)")
-    print(f" 저장 경로 / Output dir: {os.path.abspath(OUTPUT_DIR)}")
-    print(f" 분석 모델 / Prompt Model: {GENERATOR_MODEL} | 생성 모델 / Video Model: {VEO_MODEL}")
+    print(f" Starting backdrop video batch generation (Prompt Enriched Mode)")
+    print(f" Total jobs: {len(batch_jobs)} (Generating {NUM_OUTPUTS} videos per song)")
+    print(f" Output directory: {os.path.abspath(OUTPUT_DIR)}")
+    print(f" Prompt Model: {GENERATOR_MODEL} | Video Model: {VEO_MODEL}")
     print(f"==================================================")
     
     for idx, job in enumerate(batch_jobs):
-        print(f" - [{job['song_name']}] (기본 컨셉: {job['base_concept'][:60]}...)")
+        print(f" - [{job['song_name']}] (Concept: {job['base_concept'][:60]}...)")
         
     success_count = 0
     fail_count = 0
@@ -436,7 +421,7 @@ def main():
     
     for i, job in enumerate(batch_jobs):
         total_elapsed = time.time() - total_start_time
-        print(f"\n[작업 진행률 / Progress: {i+1}/{len(batch_jobs)}] (누적 소요 시간: {format_duration(total_elapsed)})")
+        print(f"\n[Job Progress: {i+1}/{len(batch_jobs)}] (Total Elapsed: {format_duration(total_elapsed)})")
         success = generate_video_job(job)
         
         if success:
@@ -445,14 +430,14 @@ def main():
             fail_count += 1
             
         if i < len(batch_jobs) - 1:
-            print("다음 작업 대기 중 (15초) / Waiting for next job (15s)...")
+            print("Waiting for next job (15s)...")
             time.sleep(15)
 
     total_elapsed = time.time() - total_start_time
     print(f"\n==================================================")
-    print("모든 비디오 생성 배치 작업이 완료되었습니다 / Batch generation completed.")
-    print(f"총 누적 소요 시간 / Total elapsed time: {format_duration(total_elapsed)}")
-    print(f"성공 / Success: {success_count}개 | 실패 / Failed: {fail_count}개")
+    print("Batch video generation completed!")
+    print(f"Total elapsed time: {format_duration(total_elapsed)}")
+    print(f"Success: {success_count} | Failed: {fail_count}")
     print(f"==================================================")
 
 if __name__ == "__main__":
