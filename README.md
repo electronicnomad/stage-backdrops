@@ -20,6 +20,13 @@ This system automatically extracts audio from reference videos, transcribes lyri
 
 ---
 
+## Demo & Showcase
+
+Explore live concert stage backdrop videos generated using this pipeline:
+- **YouTube Playlist**: [Concert Stage Backdrop Showcase](https://www.youtube.com/watch?v=PhBcSiy4xMs&list=PLBRXxQIFtEkY)
+
+---
+
 ## Directory Structure
 
 ```text
@@ -155,6 +162,13 @@ Google Gemini와 Veo 모델을 활용하여 라이브 콘서트용 16:9 (1080p) 
 - **멀티모달 프롬프트 강화**: 스타일 참조 이미지, 분석된 가사 및 음악의 톤앤매너, 초기 콘셉트 기획안을 종합하여 Veo 비디오 생성에 최적화된 100~150단어의 고해상도 영문 시각 프롬프트를 합성합니다.
 - **프롬프트 순차 기록 및 이력 관리**: 생성된 프롬프트는 번호가 겹치지 않도록 `./input/prompts/`에 순차적으로 넘버링하여 보관됩니다.
 - **고해상도 Veo 영상 생성**: Google Veo 모델(`veo-3.1-generate-preview`)을 사용하여 16:9 비율의 1080p 고품질 백월 비디오를 곡당 설정 개수만큼 순차 생성합니다.
+
+---
+
+## 제작 사례 및 샘플 영상
+
+본 파이프라인 시스템을 활용하여 실제로 제작된 콘서트 무대 백월(Stage Backdrop) 영상 모음입니다:
+- **유튜브 재생목록**: [콘서트 무대 백월 영상 제작 사례](https://www.youtube.com/watch?v=PhBcSiy4xMs&list=PLBRXxQIFtEkY)
 
 ---
 
