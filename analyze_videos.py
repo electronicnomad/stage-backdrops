@@ -64,13 +64,13 @@ def analyze_video(filepath):
         uploaded_file = upload_and_wait_file(filepath)
         
         prompt = """
-        이 비디오는 공연 백월(backdrop) 무대용으로 AI로 생성된 배경 영상입니다.
-        이 비디오에 대해 다음 항목들을 분석해서 한국어로 작성해 주세요:
+	This is an AI-generated background video designed for use as a stage backdrop during a performance.
+        Please analyze the video and provide the following details in Korean:
         
-        1. [무대 연출 분위기] 영상 전체의 감성, 어울리는 무대 연출 의도 및 분위기 요약 (2-3줄)
-        2. [비주얼 특징 & 색상] 주요 오브젝트 및 빛(조명)의 형태, 핵심 색상 톤(RGB 감성 등) 분석
-        3. [음악 매칭 추천] 이 영상에 무대 배경으로 어울리는 추천 음악 분위기 (템포, 비트 강도, 장르 등)
-        4. [해시태그] 공연 기획에서 쓸 수 있는 연출 해시태그 목록 (쉼표로 구분하여 최소 5개)
+        1. [Stage Atmosphere] A summary of the video's overall mood, as well as the intended stage atmosphere and production concept (2–3 lines).
+        2. [Visual Characteristics & Colors] An analysis of key objects, lighting forms, and the primary color palette (e.g., RGB tones).
+        3. [Music Recommendations] Recommended musical style to complement the video as a backdrop (e.g., tempo, beat intensity, genre).
+        4. [Hashtags] A list of hashtags suitable for production planning (at least 5, separated by commas).
         """
         
         print(f"-> Executing multimodal analysis with Gemini ({OMNI_MODEL})...")
