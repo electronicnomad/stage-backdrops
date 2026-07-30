@@ -1,6 +1,6 @@
 {
   "veo_model": "veo-3.1-generate-preview",
-  "prompt_generator_model": "gemini-2.5-flash",
+  "prompt_generator_model": "gemini-3.5-flash",
   "output_dir": "./output",
   "lyrics_dir": "./input/lyrics",
   "prompts_dir": "./input/prompts",

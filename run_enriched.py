@@ -35,7 +35,7 @@ with open(CONFIG_PATH, "r", encoding="utf-8") as f:
     config = json.load(f)
 
 VEO_MODEL = config.get("veo_model", "veo-3.1-generate-preview")
-GENERATOR_MODEL = config.get("prompt_generator_model", "gemini-2.5-flash")
+GENERATOR_MODEL = config.get("prompt_generator_model", "gemini-3.5-flash")
 OUTPUT_DIR = config.get("output_dir", "./output")
 LYRICS_DIR = config.get("lyrics_dir", "./input/lyrics")
 PROMPTS_DIR = config.get("prompts_dir", "./input/prompts")

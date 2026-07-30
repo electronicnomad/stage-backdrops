@@ -15,8 +15,8 @@ The system is structured as a 4-phase pipeline that analyzes reference media and
 ```mermaid
 %%{init: {'theme': 'neutral'}}%%
 flowchart TD
-    A["Input Assets<br>(./input/images & songs)"] --> B["Phase 1: Lyrics & Sound Analysis<br>(FFmpeg + Gemini 2.5 Flash)"]
-    B --> C["Phase 2: Prompt Enrichment & Archiving<br>(Gemini 2.5 Flash)"]
+    A["Input Assets<br>(./input/images & songs)"] --> B["Phase 1: Lyrics & Sound Analysis<br>(FFmpeg + Gemini 3.5 Flash)"]
+    B --> C["Phase 2: Prompt Enrichment & Archiving<br>(Gemini 3.5 Flash)"]
     C --> D["Phase 3: Veo Video Generation<br>(Veo 3.1 Model)"]
     D --> E["Phase 4: Post-Processing & Audio Merging<br>(FFmpeg + Pillow)"]
     E --> F["Final Outputs<br>(./output & ./output/merged)"]
@@ -26,8 +26,8 @@ flowchart TD
 
 | Phase | Role | Core Stack | Input / Output Path |
 | :--- | :--- | :--- | :--- |
-| **Phase 1** | Audio extraction, lyrics transcription & style analysis | FFmpeg, Gemini 2.5 Flash File API | `./input/songs/` -> `./input/lyrics/*.txt` |
-| **Phase 2** | Multimodal prompt synthesis & sequential archiving | Gemini 2.5 Flash, `config_prompts.json` | `./input/images/` -> `./input/prompts/*.txt` |
+| **Phase 1** | Audio extraction, lyrics transcription & style analysis | FFmpeg, Gemini 3.5 Flash File API | `./input/songs/` -> `./input/lyrics/*.txt` |
+| **Phase 2** | Multimodal prompt synthesis & sequential archiving | Gemini 3.5 Flash, `config_prompts.json` | `./input/images/` -> `./input/prompts/*.txt` |
 | **Phase 3** | Async 1080p 16:9 video generation & polling | Google Veo 3.1 Model (`veo-3.1-generate-preview`) | `./input/prompts/*.txt` -> `./output/*.mp4` |
 | **Phase 4** | Video verification, crossfade & audio merging | FFmpeg, Pillow (PIL) | `./output/*.mp4` -> `./output/merged/*.mp4` |
 
@@ -47,7 +47,7 @@ sequenceDiagram
     participant PL as run_enriched.py (Main Pipeline)
     participant LD as Local Disk Storage
     participant FF as FFmpeg Engine
-    participant GEM as Gemini 2.5 Flash API
+    participant GEM as Gemini 3.5 Flash API
     participant VEO as Veo 3.1 Model API
     participant MRG as merge_audio_fadeout.py
 
@@ -122,8 +122,8 @@ flowchart TD
     IS_VID -->|No| UPL["Upload Audio to Gemini File API"]
     EXT_AUD --> UPL
     
-    UPL --> GEM_L["Gemini 2.5 Flash: Transcribe Lyrics"]
-    UPL --> GEM_S["Gemini 2.5 Flash: Analyze Sound Style"]
+    UPL --> GEM_L["Gemini 3.5 Flash: Transcribe Lyrics"]
+    UPL --> GEM_S["Gemini 3.5 Flash: Analyze Sound Style"]
     
     GEM_L --> SAVE_L["Save ./input/lyrics/*_lyrics.txt"]
     GEM_S --> SAVE_S["Save ./input/lyrics/*_music_style.txt"]
@@ -138,7 +138,7 @@ Synthesizes detailed visual prompts optimized for Veo by combining style referen
 ```mermaid
 %%{init: {'theme': 'neutral'}}%%
 flowchart LR
-    IMG["./input/images/*.png"] --> GEM["Gemini 2.5 Flash<br>Prompt Synthesizer"]
+    IMG["./input/images/*.png"] --> GEM["Gemini 3.5 Flash<br>Prompt Synthesizer"]
     LYRICS["./input/lyrics/*_lyrics.txt"] --> GEM
     STYLE["./input/lyrics/*_music_style.txt"] --> GEM
     CONFIG["config_prompts.json<br>Base Concept"] --> GEM
@@ -246,8 +246,8 @@ Component matrix detailing the primary responsibilities and relationships of all
 ```mermaid
 %%{init: {'theme': 'neutral'}}%%
 flowchart TD
-    A["입력 자산<br>(./input/images & songs)"] --> B["Phase 1: 가사 & 스타일 분석<br>(FFmpeg + Gemini 2.5 Flash)"]
-    B --> C["Phase 2: 프롬프트 강화 & 아카이빙<br>(Gemini 2.5 Flash)"]
+    A["입력 자산<br>(./input/images & songs)"] --> B["Phase 1: 가사 & 스타일 분석<br>(FFmpeg + Gemini 3.5 Flash)"]
+    B --> C["Phase 2: 프롬프트 강화 & 아카이빙<br>(Gemini 3.5 Flash)"]
     C --> D["Phase 3: Veo 비디오 생성<br>(Veo 3.1 Model)"]
     D --> E["Phase 4: 후처리 & 음원 병합<br>(FFmpeg + Pillow)"]
     E --> F["최종 결과물<br>(./output & ./output/merged)"]
@@ -257,8 +257,8 @@ flowchart TD
 
 | 단계 (Phase) | 역할 (Role) | 핵심 기술 및 모델 (Core Stack) | 입력 / 출력 경로 (Input / Output Path) |
 | :--- | :--- | :--- | :--- |
-| **Phase 1** | 오디오 추출, 가사 전사 및 음악 스타일 분석 | FFmpeg, Gemini 2.5 Flash File API | `./input/songs/` -> `./input/lyrics/*.txt` |
-| **Phase 2** | 멀티모달 프롬프트 합성 및 넘버링 보관 | Gemini 2.5 Flash, `config_prompts.json` | `./input/images/` -> `./input/prompts/*.txt` |
+| **Phase 1** | 오디오 추출, 가사 전사 및 음악 스타일 분석 | FFmpeg, Gemini 3.5 Flash File API | `./input/songs/` -> `./input/lyrics/*.txt` |
+| **Phase 2** | 멀티모달 프롬프트 합성 및 넘버링 보관 | Gemini 3.5 Flash, `config_prompts.json` | `./input/images/` -> `./input/prompts/*.txt` |
 | **Phase 3** | 비동기 1080p 16:9 무대 비디오 생성 및 폴링 | Google Veo 3.1 Model (`veo-3.1-generate-preview`) | `./input/prompts/*.txt` -> `./output/*.mp4` |
 | **Phase 4** | 비디오 해상도 검증, 크로스페이드 및 음원 병합 | FFmpeg, Pillow (PIL) | `./output/*.mp4` -> `./output/merged/*.mp4` |
 
@@ -278,7 +278,7 @@ sequenceDiagram
     participant PL as run_enriched.py (메인 파이프라인)
     participant LD as 로컬 디스크 저장소
     participant FF as FFmpeg 엔진
-    participant GEM as Gemini 2.5 Flash API
+    participant GEM as Gemini 3.5 Flash API
     participant VEO as Veo 3.1 Model API
     participant MRG as merge_audio_fadeout.py
 
@@ -353,8 +353,8 @@ flowchart TD
     IS_VID -->|아니오| UPL["Gemini File API 오디오 업로드"]
     EXT_AUD --> UPL
     
-    UPL --> GEM_L["Gemini 2.5 Flash: 가사 전사"]
-    UPL --> GEM_S["Gemini 2.5 Flash: 사운드 스타일 분석"]
+    UPL --> GEM_L["Gemini 3.5 Flash: 가사 전사"]
+    UPL --> GEM_S["Gemini 3.5 Flash: 사운드 스타일 분석"]
     
     GEM_L --> SAVE_L["저장: ./input/lyrics/*_lyrics.txt"]
     GEM_S --> SAVE_S["저장: ./input/lyrics/*_music_style.txt"]
@@ -369,7 +369,7 @@ flowchart TD
 ```mermaid
 %%{init: {'theme': 'neutral'}}%%
 flowchart LR
-    IMG["./input/images/*.png"] --> GEM["Gemini 2.5 Flash <br> 프롬프트 합성기"]
+    IMG["./input/images/*.png"] --> GEM["Gemini 3.5 Flash <br> 프롬프트 합성기"]
     LYRICS["./input/lyrics/*_lyrics.txt"] --> GEM
     STYLE["./input/lyrics/*_music_style.txt"] --> GEM
     CONFIG["config_prompts.json <br> 연출 콘셉트"] --> GEM

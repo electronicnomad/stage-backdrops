@@ -52,7 +52,7 @@ This system automatically extracts audio from reference videos, transcribes lyri
    # macOS (Homebrew)
    brew install ffmpeg
    ```
-3. **Google Gemini API Key**: An active API key with access to Gemini Flash (`gemini-2.5-flash`) and Veo (`veo-3.1-generate-preview`).
+3. **Google Gemini API Key**: An active API key with access to Gemini Flash (`gemini-3.5-flash`) and Veo (`veo-3.1-generate-preview`).
 
 ---
 
@@ -85,7 +85,7 @@ You can customize the generation pipeline behavior by modifying `config_prompts.
 ```json
 {
   "veo_model": "veo-3.1-generate-preview",
-  "prompt_generator_model": "gemini-2.5-flash",
+  "prompt_generator_model": "gemini-3.5-flash",
   "output_dir": "./output",
   "lyrics_dir": "./input/lyrics",
   "prompts_dir": "./input/prompts",
@@ -190,7 +190,7 @@ Google Gemini와 Veo 모델을 활용하여 라이브 콘서트용 16:9 (1080p) 
    # macOS (Homebrew)
    brew install ffmpeg
    ```
-3. **Google Gemini API Key**: Gemini Flash (`gemini-2.5-flash`) 및 Veo (`veo-3.1-generate-preview`) 모델에 접근 가능한 API 키가 필요합니다.
+3. **Google Gemini API Key**: Gemini Flash (`gemini-3.5-flash`) 및 Veo (`veo-3.1-generate-preview`) 모델에 접근 가능한 API 키가 필요합니다.
 
 ---
 
