@@ -142,6 +142,44 @@ If you have already generated and stored prompts in `./input/prompts/` and want 
 3. Enter the number of backdrop videos you want to generate.
 4. The script will automatically resolve the song name, read the selected prompt content, find vacant indices in `./output/` to avoid overwriting, and start generating.
 
+---
+
+## Post-Processing Utilities: Video & Audio Merging
+
+### 1. Merging Multiple Backdrop Clips (`merge_videos.py`)
+Concatenates generated video clips in `./output/` grouped by song name into a single continuous video with smooth crossfade transitions (`xfade`).
+
+- **Role**: Automatically groups files matching `{song}_backdrop_{n}.mp4`, applies crossfade transitions (`fade`, 1.0s), and outputs to `./output/merged/{song}_merged.mp4`.
+- **Usage**:
+  ```bash
+  python3 merge_videos.py
+  ```
+
+### 2. Audio & Video Merging with Fade Effects (`merge_audio_fadeout.py`)
+Combines a video backdrop with an audio track, automatically looping the video to match the audio length, applying fade-in/out effects, and overlaying text (e.g. song titles/credits).
+
+- **Role**: Loops video to match audio duration, applies video/audio fade-in/out, overlays styled text in the center, and saves the final production file.
+- **Usage**:
+  ```bash
+  python3 merge_audio_fadeout.py \
+    -v output/my_song_backdrop_1.mp4 \
+    -a input/songs/my_song.mp3 \
+    -o output/merged/my_song_final.mp4 \
+    -t "Artist - Song Title" \
+    --fade-out 2.0
+  ```
+- **CLI Options**:
+  - `-v, --video`: Input video file path (required)
+  - `-a, --audio`: Input audio file path (required)
+  - `-o, --output`: Output video file path (required)
+  - `-t, --text`: Text string to overlay in screen center (optional)
+  - `-fo, --fade-out`: Fade-out duration in seconds (default: 2.0)
+  - `-fi, --fade-in`: Fade-in duration in seconds (default: 0.0)
+  - `-td, --text-duration`: Text display duration in seconds (default: 3.0)
+  - `-fs, --fontsize`: Font size for overlay text (default: 60)
+  - `-fc, --fontcolor`: Font color for overlay text (default: "white")
+  - `-ff, --fontfile`: Path to custom TTF/TTC font file (optional)
+
 <div style="page-break-before: always;"></div>
 
 ---
@@ -273,3 +311,41 @@ Google Gemini와 Veo 모델을 활용하여 라이브 콘서트용 16:9 (1080p) 
 2. 화면에 출력되는 가용 프롬프트 목록에서 사용할 번호를 선택합니다.
 3. 생성할 비디오 개수를 터미널에 입력합니다.
 4. 프로그램이 곡명을 판별하고, `./output/` 내의 기존 파일 개수를 감지하여 덮어쓰지 않고 비어있는 다음 번호부터 비디오를 안전하게 생성합니다.
+
+---
+
+## 후처리 유틸리티: 비디오 병합 및 음원 페이드 결합
+
+### 1. 다중 백월 비디오 교차 병합 (`merge_videos.py`)
+`./output/` 디렉터리에 생성된 곡별 개별 백월 영상들(`{song}_backdrop_1.mp4`, `..._2.mp4` 등)을 곡 그룹 단위로 자동 감지하여 교차 감쇠(크로스페이드) 효과와 함께 하나의 긴 영상으로 결합합니다.
+
+- **역할**: 곡명 패턴을 기반으로 영상 파일들을 정렬 및 묶어, FFmpeg `xfade` 필터를 통해 영상 간 연결부를 부드럽게 크로스페이드 처리하여 `./output/merged/{song}_merged.mp4`로 출력합니다.
+- **사용 방법**:
+  ```bash
+  python3 merge_videos.py
+  ```
+
+### 2. 비디오-음원 결합 및 페이드 연출 (`merge_audio_fadeout.py`)
+무음 배경 영상에 원본 음원을 결합하고, 음원 길이에 맞춰 영상을 자동 루프(loop) 연결하며, 영상/음원의 페이드 인/아웃 전환 효과 및 화면 중앙 자막 오버레이를 적용합니다.
+
+- **역할**: 음악 길이에 맞춰 영상 루프 연장, 시작/종료 지점 페이드 인/아웃 필터 적용, 곡 제목 등의 텍스트 오버레이를 한 번에 처리하여 최종 상영용 비디오를 완성합니다.
+- **사용 방법**:
+  ```bash
+  python3 merge_audio_fadeout.py \
+    -v output/my_song_backdrop_1.mp4 \
+    -a input/songs/my_song.mp3 \
+    -o output/merged/my_song_final.mp4 \
+    -t "아티스트 - 곡 제목" \
+    --fade-out 2.0
+  ```
+- **주요 CLI 옵션**:
+  - `-v, --video`: 입력 비디오 파일 경로 (필수)
+  - `-a, --audio`: 입력 오디오 파일 경로 (필수)
+  - `-o, --output`: 출력 비디오 파일 경로 (필수)
+  - `-t, --text`: 화면 중앙에 오버레이할 자막/곡명 텍스트 (선택)
+  - `-fo, --fade-out`: 페이드아웃 적용 시간(초) (기본값: 2.0)
+  - `-fi, --fade-in`: 페이드인 적용 시간(초) (기본값: 0.0)
+  - `-td, --text-duration`: 자막 노출 시간(초) (기본값: 3.0)
+  - `-fs, --fontsize`: 자막 폰트 크기 (기본값: 60)
+  - `-fc, --fontcolor`: 자막 폰트 색상 (기본값: "white")
+  - `-ff, --fontfile`: 커스텀 TTF/TTC 폰트 파일 경로 (선택)
