@@ -4,8 +4,6 @@ This document specifies the end-to-end architecture and modular structure of the
 
 ---
 
-# Part 1. English Specification
-
 ## 1. High-Level System Overview
 
 The system is structured as a 4-phase pipeline that analyzes reference media and style assets, synthesizes optimized stage visual prompts, generates high-definition (1080p 16:9) backdrop videos, and performs post-processing audio-visual merging.
@@ -223,12 +221,15 @@ Component matrix detailing the primary responsibilities and relationships of all
    - Accounts for Veo video generation time (1 to 3 minutes) with `polling_interval_sec` (default: 20s) and `polling_timeout_sec` (default: 900s).
    - Includes retry logic for network and API failures to guarantee continuous batch execution.
 
----
----
-
 <div style="page-break-before: always;"></div>
 
-# Part 2. 한국어 명세서 (Korean Specification)
+---
+
+# AI 기반 콘서트 무대 백월 영상 생성기 아키텍처 (AI-Powered Concert Stage Backdrop Generator Architecture)
+
+본 문서는 Google Gemini 및 Veo 모델을 활용한 콘서트 무대 배경(Stage Backdrop) 비디오 자동화 생성 시스템의 엔드투엔드(End-to-End) 아키텍처 및 모듈 구조를 명세합니다.
+
+---
 
 ## 1. 전체 시스템 개요 (High-Level System Overview)
 
