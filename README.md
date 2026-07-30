@@ -24,7 +24,7 @@ This system automatically extracts audio from reference videos, transcribes lyri
 
 ```text
 .
-├── run_enriched.py          # Main execution pipeline (Enriched prompt & Veo generation)
+├── run.py                   # Main execution pipeline (Enriched prompt & Veo generation)
 ├── run_single_prompt.py     # CLI tool to generate videos from selected archived prompts
 ├── analyze_videos.py        # Video analysis and verification utility
 ├── merge_videos.py          # Utility for merging and concatenating backdrop outputs
@@ -110,7 +110,7 @@ You can customize the generation pipeline behavior by modifying `config_prompts.
 2. Place your reference media files (videos or audio tracks) into `./input/songs/` (e.g., `my_song.mov`, `my_song.mp3`).
 3. Execute the enriched generation script:
    ```bash
-   python3 run_enriched.py
+   python3 run.py
    ```
 
 The script will:
@@ -162,7 +162,7 @@ Google Gemini와 Veo 모델을 활용하여 라이브 콘서트용 16:9 (1080p) 
 
 ```text
 .
-├── run_enriched.py          # 메인 실행 파이프라인 (프롬프트 강화 및 Veo 비디오 생성)
+├── run.py                   # 메인 실행 파이프라인 (프롬프트 강화 및 Veo 비디오 생성)
 ├── run_single_prompt.py     # 아카이빙된 프롬프트를 선택해 비디오를 만드는 CLI 도구
 ├── analyze_videos.py        # 생성된 비디오의 해상도 및 재생 시간 유효성 검증 유틸리티
 ├── merge_videos.py          # 여러 백월 비디오를 크로스페이드로 자연스럽게 결합하는 병합 유틸리티
@@ -232,7 +232,7 @@ Google Gemini와 Veo 모델을 활용하여 라이브 콘서트용 16:9 (1080p) 
 2. 분석 대상 음원 또는 비디오 파일을 `./input/songs/`에 배치합니다 (예: `my_song.mov` 또는 `my_song.mp3`).
 3. 전체 생성 파이프라인을 가동합니다:
    ```bash
-   python3 run_enriched.py
+   python3 run.py
    ```
 
 스크립트 실행 결과:

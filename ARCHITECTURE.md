@@ -44,14 +44,14 @@ The sequence diagram below illustrates the interactions among all system compone
 sequenceDiagram
     autonumber
     actor User as User / Operator
-    participant PL as run_enriched.py (Main Pipeline)
+    participant PL as run.py (Main Pipeline)
     participant LD as Local Disk Storage
     participant FF as FFmpeg Engine
     participant GEM as Gemini 3.5 Flash API
     participant VEO as Veo 3.1 Model API
     participant MRG as merge_audio_fadeout.py
 
-    User->>PL: Execute Pipeline (python3 run_enriched.py)
+    User->>PL: Execute Pipeline (python3 run.py)
     PL->>LD: Scan Input Directories (input/images, input/songs)
     
     loop For each song / reference pair
@@ -192,7 +192,7 @@ Component matrix detailing the primary responsibilities and relationships of all
 
 | Script / File | Core Responsibilities | Key Dependencies |
 | :--- | :--- | :--- |
-| `run_enriched.py` | Main batch pipeline. Executes Phases 1 through 3 sequentially | `google-genai`, `python-dotenv`, FFmpeg |
+| `run.py` | Main batch pipeline. Executes Phases 1 through 3 sequentially | `google-genai`, `python-dotenv`, FFmpeg |
 | `run_single_prompt.py` | CLI utility to select an archived prompt file and generate additional videos | `google-genai`, `python-dotenv` |
 | `merge_audio_fadeout.py` | Audio-video merging tool. Features video auto-looping, fade in/out, and text overlay | FFmpeg, `pillow` |
 | `merge_videos.py` | Video concatenation utility with crossfade transitions | FFmpeg |
@@ -275,14 +275,14 @@ flowchart TD
 sequenceDiagram
     autonumber
     actor User as 사용자 / 운영자
-    participant PL as run_enriched.py (메인 파이프라인)
+    participant PL as run.py (메인 파이프라인)
     participant LD as 로컬 디스크 저장소
     participant FF as FFmpeg 엔진
     participant GEM as Gemini 3.5 Flash API
     participant VEO as Veo 3.1 Model API
     participant MRG as merge_audio_fadeout.py
 
-    User->>PL: 파이프라인 실행 (python3 run_enriched.py)
+    User->>PL: 파이프라인 실행 (python3 run.py)
     PL->>LD: 입력 디렉토리 스캔 (input/images, input/songs)
     
     loop 각 곡 / 레퍼런스 세트별 반복
@@ -423,7 +423,7 @@ flowchart TD
 
 | 스크립트 / 파일 | 역할 및 주요 기능 | 주요 의존성 |
 | :--- | :--- | :--- |
-| `run_enriched.py` | 메인 배치 파이프라인. Phase 1~3 전체 프로세스를 순차 실행 | `google-genai`, `python-dotenv`, FFmpeg |
+| `run.py` | 메인 배치 파이프라인. Phase 1~3 전체 프로세스를 순차 실행 | `google-genai`, `python-dotenv`, FFmpeg |
 | `run_single_prompt.py` | 저장된 프롬프트 파일 선택 후 추가 영상만 단독 생성하는 CLI 유틸리티 | `google-genai`, `python-dotenv` |
 | `merge_audio_fadeout.py` | 비디오와 음원 결합. 영상 자동 루프, 페이드 인/아웃, 텍스트 자막 오버레이 적용 | FFmpeg, `pillow` |
 | `merge_videos.py` | 여러 개별 백월 비디오를 크로스페이드로 이어붙여 긴 무대 영상 작성 | FFmpeg |
