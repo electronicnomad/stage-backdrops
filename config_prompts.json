@@ -1,0 +1,22 @@
+{
+  "veo_model": "veo-3.1-generate-preview",
+  "prompt_generator_model": "gemini-2.5-flash",
+  "output_dir": "./output",
+  "lyrics_dir": "./input/lyrics",
+  "prompts_dir": "./input/prompts",
+  "num_outputs": 30,
+  "polling_timeout_sec": 900,
+  "polling_interval_sec": 20,
+  "default_prompt": "Abstract ambient backdrop, beautiful flowing colors, cinematic light leaks, slow motion, seamless loop, 16:9",
+  "song_prompts": {
+    "10cm-gradation": "A colorful watercolor paint spreading and bleeding on wet paper, transitioning between soft yellow, warm pink, and dreamy purple, beautiful visual art style, slow motion, loop vibe, 16:9",
+    "10cm-just_10cm": "Cozy warm room atmosphere, soft light leaks through the window, cute minimalist drawing art style, slow and relaxing movement, 16:9",
+    "10cm-love_in_milky_way_cafe": "Retro style milky way cafe, neon signs glowing in starry space, pastel coffee cups floating gently, dreamlike animations, 16:9",
+    "10cm-phone_cert": "Pulsing warm orange light waves resembling a music visualizer, cozy concert lighting, slow dynamic movement, 16:9",
+    "10cm-sdsd": "Soft hand-drawn illustration style, warm touch textures, gentle breeze blowing grass, highly comforting and cute backdrop, 16:9",
+    "10cm-to_you": "Emotional sunset sky, clouds slowly drifting, cinematic light rays, warm memories vibe, romantic and slow motion, 16:9",
+    "10cm-what_the_spring": "Blooming cherry blossom petals falling against a dark gray rainy sky, sarcastic contrast, minimalist graphic illustration style, 16:9"
+  },
+  "prompt_generator_system_instruction": "You are a professional concert visual director and video backdrop designer. Your job is to create a detailed, highly descriptive video generation prompt (for models like Veo) in English.",
+  "prompt_generator_user_template": "Create a premium, detailed stage backdrop video prompt (around 100-150 words, in English) for the song '{song_name}'.\n\nWe have provided some source materials:\n1. Base Concept/Vibe: {base_concept}\n2. Song Lyrics (extracted from the audio): {lyrics}\n3. Music & Audio Style Analysis: {music_style}\n4. Style Reference Image: (Provided as an attached image file)\n\nRequirements for the generated prompt:\n- Focus on ambient motion, lighting, color palette, style, texture, and slow/relaxing movement.\n- The style of the video must be highly influenced by the provided style reference image.\n- The mood of the video must match the emotional flow of the lyrics and music style.\n- The video must be designed as a 16:9 stage backdrop suitable for live concerts (no sudden cuts, slow-paced, seamless loop vibe, visually stunning).\n- Output ONLY the final prompt text. Do not write any explanations, introductory text, or markdown code blocks."
+}

@@ -1,0 +1,50 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# OS & Editor generated files
+.DS_Store
+[Dd]esktop.ini
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+$RECYCLE.BIN/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Backup & Scratch directories
+__backup/
+scratch/
+output/
+img/
+mp4/
+
+# Large Media & Copyrighted files (Audio / Video / Images / Generated Caches)
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.mp3
+*.wav
+*.flac
+*.aac
+*.png
+*.jpg
+*.jpeg
+
+# Generated Caches & History
+input/lyrics/*.txt
+input/prompts/*.txt
+
+# Exception: keep gitkeep files to maintain directory structure
+!.gitkeep

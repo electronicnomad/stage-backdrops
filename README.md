@@ -1,0 +1,247 @@
+# AI-Powered Concert Stage Backdrop Generator
+
+A full-stack automation pipeline designed to generate stunning, premium 16:9 (1080p) stage backdrop videos for live concerts using Google Gemini and Veo models.
+
+This system automatically extracts audio from reference videos, transcribes lyrics using multimodal analysis, synthesizes enriched artistic prompts with style reference images, and generates seamless looping concert background videos.
+
+---
+
+## Key Features
+
+- **Automated Resource Scanning**: Dynamically discovers input images (`./input/images`) and reference media files (`./input/songs`) to build automated batch generation jobs.
+- **Intelligent Lyrics Extraction**: Extracts audio using FFmpeg and utilizes the Gemini File API to transcribe lyrics. Saved lyrics (`./input/lyrics/*.txt`) are automatically reused in subsequent runs to minimize unnecessary API calls.
+- **Multimodal Prompt Enrichment**: Integrates style reference images, song lyrics, and foundational aesthetic concepts into detailed 100-150 word visual prompts optimized for concert visuals.
+- **Sequential Prompt Archiving**: Automatically archives every generated prompt into `./input/prompts/{song}_prompt_{n}.txt` with incremental numbering, ensuring no generation prompt history is lost.
+- **High-Definition Veo Video Generation**: Communicates with Google's Veo model (`veo-3.1-generate-preview`) to generate professional 1080p 16:9 stage visual backdrops with automatic polling and retry mechanisms.
+
+---
+
+## Directory Structure
+
+```text
+.
+├── run_enriched.py          # Main execution pipeline (Enriched prompt & Veo generation)
+├── run_single_prompt.py     # CLI tool to generate videos from selected archived prompts
+├── analyze_videos.py        # Video analysis and verification utility
+├── merge_videos.py          # Utility for merging and concatenating backdrop outputs
+├── merge_audio_fadeout.py   # Utility for merging video & audio with auto fade-in/out and text overlay
+├── config_prompts.json      # Global pipeline configuration and per-song aesthetic prompts
+├── requirements.txt         # Python dependency definitions
+├── .env                     # Environment variables containing GEMINI_KEY
+├── input/                   # Integrated input source and cache directory
+│   ├── images/              # Style reference images (.png, .jpg)
+│   ├── songs/               # Original song reference media files for audio extraction (.mp4, .mov, .mp3, etc.)
+│   ├── lyrics/              # Extracted and saved song lyrics (.txt) and music style analyses (.txt)
+│   └── prompts/             # Sequentially archived enriched prompts (.txt)
+├── output/                  # Final generated 1080p video backdrops (.mp4)
+│   └── merged/              # Merged final video files
+└── scratch/                 # Temporary workspace for intermediate audio files (.mp3)
+```
+
+---
+
+## Prerequisites
+
+1. **Python 3.10 or higher**
+2. **FFmpeg**: Required for extracting audio tracks from input media files (such as MP4, MOV, etc.). Ensure `ffmpeg` is installed and accessible in your system `PATH`.
+   ```bash
+   # macOS (Homebrew)
+   brew install ffmpeg
+   ```
+3. **Google Gemini API Key**: An active API key with access to Gemini Flash (`gemini-2.5-flash`) and Veo (`veo-3.1-generate-preview`).
+
+---
+
+## Installation & Setup
+
+1. **Clone or navigate to the repository**:
+   ```bash
+   cd /path/to/project
+   ```
+
+2. **Set up a Python virtual environment and install dependencies**:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+3. **Configure API Credentials**:
+   Create a `.env` file in the root directory and insert your Gemini API key:
+   ```env
+   GEMINI_KEY=your_actual_gemini_api_key_here
+   ```
+
+---
+
+## Configuration (`config_prompts.json`)
+
+You can customize the generation pipeline behavior by modifying `config_prompts.json`:
+
+```json
+{
+  "veo_model": "veo-3.1-generate-preview",
+  "prompt_generator_model": "gemini-2.5-flash",
+  "output_dir": "./output",
+  "lyrics_dir": "./input/lyrics",
+  "prompts_dir": "./input/prompts",
+  "num_outputs": 3,
+  "polling_timeout_sec": 900,
+  "polling_interval_sec": 20,
+  "default_prompt": "Abstract ambient backdrop, beautiful flowing colors, cinematic light leaks, slow motion, seamless loop, 16:9",
+  "song_prompts": {
+    "song_name": "Specific base aesthetic concept for this song..."
+  }
+}
+```
+
+- `num_outputs`: Number of unique backdrop videos generated per song (default: 3).
+- `prompts_dir`: Directory where enriched prompts are archived sequentially.
+
+---
+
+## Usage
+
+1. Place your style reference images into `./input/images/` (e.g., `my_song.png`).
+2. Place your reference media files (videos or audio tracks) into `./input/songs/` (e.g., `my_song.mov`, `my_song.mp3`).
+3. Execute the enriched generation script:
+   ```bash
+   python3 run_enriched.py
+   ```
+
+The script will:
+1. Extract audio and transcribe lyrics to `./input/lyrics/my_song_lyrics.txt`.
+2. Generate an enriched visual prompt and archive it to `./input/prompts/my_song_prompt_1.txt` (incrementing automatically on future runs).
+3. Generate and save the final 1080p stage videos to `./output/my_song_backdrop_1.mp4`, `..._2.mp4`, and `..._3.mp4`.
+
+---
+
+## Alternative Usage: Generating Videos from Archived Prompts
+
+If you have already generated and stored prompts in `./input/prompts/` and want to create additional videos using a specific prompt file without running the entire pipeline, you can use the single prompt runner:
+
+1. Execute the single prompt utility:
+   ```bash
+   python3 run_single_prompt.py
+   ```
+2. You will be presented with a list of available prompts found in `./input/prompts/`. Select the prompt number you wish to use.
+3. Enter the number of backdrop videos you want to generate.
+4. The script will automatically resolve the song name, read the selected prompt content, find vacant indices in `./output/` to avoid overwriting, and start generating.
+
+<div style="page-break-before: always;"></div>
+
+---
+
+# AI 기반 콘서트 무대 백월 영상 생성기 (AI-Powered Concert Stage Backdrop Generator)
+
+Google Gemini와 Veo 모델을 활용하여 라이브 콘서트용 16:9 (1080p) stage backdrop 영상을 생성하는 자동화 파이프라인 시스템입니다.
+
+본 시스템은 참조 영상에서 음원을 분리하고 가사를 추출하여 분석하며, 스타일 레퍼런스 이미지와 함께 예술적 감각의 상세 연출 프롬프트를 자동으로 생성하고, Veo 모델을 통해 부드러운 루프 형태의 무대 배경 영상을 만들어 냅니다.
+
+---
+
+## 주요 기능
+
+- **자동 리소스 탐색**: `./input/images` 및 `./input/songs` 내의 이미지와 미디어 파일을 자동 감지하여 배치 작업을 생성합니다.
+- **스마트한 가사 추출 및 캐싱**: 비디오 포맷일 경우 FFmpeg로 오디오를 추출하고 Gemini File API로 가사 및 음악 스타일을 분석합니다. 분석된 가사 및 스타일 정보는 `./input/lyrics/` 하위에 저장되어 이후 실행 시 API 재호출 없이 캐시로 재사용됩니다.
+- **멀티모달 프롬프트 강화**: 스타일 참조 이미지, 분석된 가사 및 음악의 톤앤매너, 초기 콘셉트 기획안을 종합하여 Veo 비디오 생성에 최적화된 100~150단어의 고해상도 영문 시각 프롬프트를 합성합니다.
+- **프롬프트 순차 기록 및 이력 관리**: 생성된 프롬프트는 번호가 겹치지 않도록 `./input/prompts/`에 순차적으로 넘버링하여 보관됩니다.
+- **고해상도 Veo 영상 생성**: Google Veo 모델(`veo-3.1-generate-preview`)을 사용하여 16:9 비율의 1080p 고품질 백월 비디오를 곡당 설정 개수만큼 순차 생성합니다.
+
+---
+
+## 디렉토리 구조
+
+```text
+.
+├── run_enriched.py          # 메인 실행 파이프라인 (프롬프트 강화 및 Veo 비디오 생성)
+├── run_single_prompt.py     # 아카이빙된 프롬프트를 선택해 비디오를 만드는 CLI 도구
+├── analyze_videos.py        # 생성된 비디오의 해상도 및 재생 시간 유효성 검증 유틸리티
+├── merge_videos.py          # 여러 백월 비디오를 크로스페이드로 자연스럽게 결합하는 병합 유틸리티
+├── merge_audio_fadeout.py   # 비디오와 음원을 합치며 자동 루프, 페이드 인/아웃 및 자막 텍스트 오버레이 적용 유틸리티
+├── config_prompts.json      # 파이프라인 전역 설정 및 곡별 시각 예술 콘셉트 기획안
+├── requirements.txt         # 파이썬 의존성 패키지 명세
+├── .env                     # Gemini API 키를 저장하는 환경 변수 파일
+├── input/                   # 입력 자산 및 텍스트 캐시 통합 디렉토리
+│   ├── images/              # 연출에 참조할 스타일 레퍼런스 이미지 보관 (.png, .jpg)
+│   ├── songs/               # 가사 및 분위기 분석용 원본 미디어 파일 (.mp4, .mov, .mp3, .wav 등)
+│   ├── lyrics/              # Gemini가 전사한 가사 및 음악 스타일 캐시 파일 (.txt)
+│   └── prompts/             # 순차 번호로 저장 및 아카이빙된 강화 프롬프트 (.txt)
+├── output/                  # Veo가 생성한 곡별 최종 1080p 배경 비디오 보관
+│   └── merged/              # 병합된 최종 비디오 파일 보관
+└── scratch/                 # 작업 중 오디오 파일 추출 등을 위한 임시 폴더
+```
+
+---
+
+## 사전 요구 사항
+
+1. **Python 3.10 이상**
+2. **FFmpeg**: 비디오 파일에서 음원 트랙을 분리하기 위해 필요합니다. 시스템 `PATH`에 등록되어 있어야 합니다.
+   ```bash
+   # macOS (Homebrew)
+   brew install ffmpeg
+   ```
+3. **Google Gemini API Key**: Gemini Flash (`gemini-2.5-flash`) 및 Veo (`veo-3.1-generate-preview`) 모델에 접근 가능한 API 키가 필요합니다.
+
+---
+
+## 설치 및 설정 방법
+
+1. **저장소 위치로 이동**:
+   ```bash
+   cd /path/to/project
+   ```
+
+2. **가상환경 구성 및 의존성 패키지 설치**:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+3. **API 인증 설정**:
+   루트 디렉토리에 `.env` 파일을 생성하고 본인의 API 키를 등록합니다.
+   ```env
+   GEMINI_KEY=본인의_gemini_api_key_입력
+   ```
+
+---
+
+## 설정 설명 (`config_prompts.json`)
+
+`config_prompts.json` 설정을 통해 파이프라인 작동을 커스터마이징할 수 있습니다:
+
+- `num_outputs`: 곡당 생성할 독립적인 영상 개수 (기본값: 30).
+- `prompts_dir`: 생성된 연출 프롬프트가 보관되는 아카이브 디렉토리 경로.
+- `lyrics_dir`: 가사 및 음악 스타일 분석 결과 캐시 텍스트가 저장되는 경로.
+
+---
+
+## 사용 방법
+
+1. 무대 영상의 스타일 소스가 될 이미지를 `./input/images/`에 배치합니다 (예: `my_song.png`).
+2. 분석 대상 음원 또는 비디오 파일을 `./input/songs/`에 배치합니다 (예: `my_song.mov` 또는 `my_song.mp3`).
+3. 전체 생성 파이프라인을 가동합니다:
+   ```bash
+   python3 run_enriched.py
+   ```
+
+스크립트 실행 결과:
+1. 오디오 추출 및 가사/사운드 스타일 분석이 진행되어 `./input/lyrics/my_song_lyrics.txt` 및 `my_song_music_style.txt`에 저장 및 캐싱됩니다.
+2. 스타일 분석과 레퍼런스 이미지를 조합해 강화된 프롬프트를 작성하고, `./input/prompts/my_song_prompt_1.txt`에 누적 아카이빙합니다 (기존 파일이 있으면 증가된 번호로 저장).
+3. 최종 1080p 16:9 백월 비디오들이 `./output/my_song_backdrop_1.mp4`, `..._2.mp4` 형태로 설정 개수만큼 안전하게 추가 생성됩니다.
+
+---
+
+## 추가 유틸리티: 저장된 프롬프트로 비디오 추가 생성
+
+이미 `./input/prompts/`에 이력이 보관되어 있고, 전체 분석 파이프라인을 처음부터 돌릴 필요 없이 특정 프롬프트만을 사용하여 영상만 바로 더 찍어내고 싶을 때 `run_single_prompt.py`를 사용합니다:
+
+1. 단일 프롬프트 비디오 추가 생성 유틸리티를 실행합니다:
+   ```bash
+   python3 run_single_prompt.py
+   ```
+2. 화면에 출력되는 가용 프롬프트 목록에서 사용할 번호를 선택합니다.
+3. 생성할 비디오 개수를 터미널에 입력합니다.
+4. 프로그램이 곡명을 판별하고, `./output/` 내의 기존 파일 개수를 감지하여 덮어쓰지 않고 비어있는 다음 번호부터 비디오를 안전하게 생성합니다.
