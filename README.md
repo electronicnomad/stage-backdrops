@@ -159,6 +159,7 @@ Concatenates generated video clips in `./output/` grouped by song name into a si
 Combines a video backdrop with an audio track, automatically looping the video to match the audio length, applying fade-in/out effects, and overlaying text (e.g. song titles/credits).
 
 - **Role**: Loops video to match audio duration, applies video/audio fade-in/out, overlays styled text in the center, and saves the final production file.
+- **Example Result**: [YouTube Output Showcase](https://www.youtube.com/watch?v=NyH5T-Y-f94)
 - **Usage**:
   ```bash
   python3 merge_audio_fadeout.py \
@@ -329,6 +330,7 @@ Google Gemini와 Veo 모델을 활용하여 라이브 콘서트용 16:9 (1080p) 
 무음 배경 영상에 원본 음원을 결합하고, 음원 길이에 맞춰 영상을 자동 루프(loop) 연결하며, 영상/음원의 페이드 인/아웃 전환 효과 및 화면 중앙 자막 오버레이를 적용합니다.
 
 - **역할**: 음악 길이에 맞춰 영상 루프 연장, 시작/종료 지점 페이드 인/아웃 필터 적용, 곡 제목 등의 텍스트 오버레이를 한 번에 처리하여 최종 상영용 비디오를 완성합니다.
+- **결과물 예시**: [유튜브 구현 예시 영상](https://www.youtube.com/watch?v=NyH5T-Y-f94)
 - **사용 방법**:
   ```bash
   python3 merge_audio_fadeout.py \
